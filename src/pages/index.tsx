@@ -3,16 +3,24 @@ import styles from "@/styles/Home.module.css";
 
 export default function Home() {
   const [texte, setTexte] = useState('');
-  const [curseurVisible, setCurseurVisible] = useState(true);
   const [choixSelectionne, setChoixSelectionne] = useState(0);
   const [choixVisible, setChoixVisible] = useState(false);
   const [animationTerminee, setAnimationTerminee] = useState(false);
+  const [bip, setBip] = useState<HTMLAudioElement | null>(null);
+  const [confirm, setConfirm] = useState<HTMLAudioElement | null>(null);
+
   const message = 'Quel portfolio veux-tu visiter ?';
   const choix = ['Portfolio simple', 'Portfolio 2D'];
   const liens = [
     'https://portfolio.friedrichalyssa.com',
     'https://portfoliojs.friedrichalyssa.com'
   ];
+
+  useEffect(() => {
+    setBip(new Audio('/sounds/bip.mp3'));
+    setConfirm(new Audio('/sounds/confirm.mp3'));
+  }, []);
+
   useEffect(() => {
     let index = 0;
     let texteActuel = '';
@@ -36,16 +44,17 @@ export default function Home() {
   }, [animationTerminee]);
 
   const gererTouche = (evenement: KeyboardEvent) => {
-    if (evenement.key === "ArrowUp") {
-      setChoixSelectionne((prev) => (prev === 0 ? 1 : 0));
-    } else if (evenement.key === "ArrowDown") {
-      setChoixSelectionne((prev) => (prev === 1 ? 0 : 1));
+    if (evenement.key === "ArrowUp" || evenement.key === "ArrowDown") {
+      setChoixSelectionne((prev) => {
+        bip?.play();
+        return prev === 0 ? 1 : 0;
+      });
     } else if (evenement.key === "Enter") {
-      const url = choixSelectionne === 0 
-        ? 'https://portfolio.friedrichalyssa.com' 
-        : 'https://portfoliojs.friedrichalyssa.com'; 
-        window.open(url, '_blank');
-      }
+      confirm?.play();
+      setTimeout(() => {
+        window.open(liens[choixSelectionne], '_blank');
+      }, 200);
+    }
   };
 
   useEffect(() => {
@@ -53,7 +62,7 @@ export default function Home() {
     return () => {
       window.removeEventListener('keydown', gererTouche);
     };
-  }, [choixSelectionne]);
+  }, [choixSelectionne, bip, confirm]);
 
   return (
     <div className={styles.container}>
@@ -67,7 +76,12 @@ export default function Home() {
             <p
               key={index}
               className={choixSelectionne === index ? styles.selectedChoice : ''}
-              onClick={() => window.open(liens[index], '_blank')}
+              onClick={() => {
+                confirm?.play();
+                setTimeout(() => {
+                  window.open(liens[index], '_blank');
+                }, 200);
+              }}
             >
               {choixSelectionne === index ? '> ' : ''}{choixItem}
             </p>
