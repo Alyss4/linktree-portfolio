@@ -9,7 +9,10 @@ export default function Home() {
   const [animationTerminee, setAnimationTerminee] = useState(false);
   const message = 'Quel portfolio veux-tu visiter ?';
   const choix = ['Portfolio simple', 'Portfolio 2D'];
-
+  const liens = [
+    'https://portfolio.friedrichalyssa.com',
+    'https://portfoliojs.friedrichalyssa.com'
+  ];
   useEffect(() => {
     let index = 0;
     let texteActuel = '';
@@ -38,8 +41,11 @@ export default function Home() {
     } else if (evenement.key === "ArrowDown") {
       setChoixSelectionne((prev) => (prev === 1 ? 0 : 1));
     } else if (evenement.key === "Enter") {
-      alert(`Choix sélectionné: ${choix[choixSelectionne]}`);
-    }
+      const url = choixSelectionne === 0 
+        ? 'https://portfolio.friedrichalyssa.com' 
+        : 'https://portfoliojs.friedrichalyssa.com'; 
+        window.open(url, '_blank');
+      }
   };
 
   useEffect(() => {
@@ -61,6 +67,7 @@ export default function Home() {
             <p
               key={index}
               className={choixSelectionne === index ? styles.selectedChoice : ''}
+              onClick={() => window.open(liens[index], '_blank')}
             >
               {choixSelectionne === index ? '> ' : ''}{choixItem}
             </p>
